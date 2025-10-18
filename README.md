@@ -1,4 +1,4 @@
-# CL.IA: O Coder genérico
+# CL.IA: Um copiloto de IA CLI autônomo.
 
 ## 📝 Descrição
 

@@ -1,18 +1,38 @@
 {
-  "name": "minha-cli-js",
+  "name": "cl.ia",
   "version": "1.0.0",
-  "description": "",
-  "main": ".src/index.js",
+  "description": "Um copiloto de IA CLI autônomo. Interaja com Gemini, OpenAI (GPT) e Claude (Anthropic) diretamente do seu terminal.",
+  "main": "src/index.js",
   "type": "module",
   "bin": {
-    "cli-teste": "./src/index.js"
+    "clia": "./src/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WandersonMJ/CLIA.git"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "agent",
+    "llm",
+    "gemini",
+    "openai",
+    "gpt",
+    "claude",
+    "anthropic",
+    "copilot",
+    "terminal"
+  ],
+  "author": "Wanderson Marques",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WandersonMJ/CLIA/issues"
+  },
+  "homepage": "https://github.com/WandersonMJ/CLIA#readme",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.67.0",
     "@google/generative-ai": "^0.24.1",
