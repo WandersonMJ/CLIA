@@ -25,7 +25,7 @@ Como o projeto (ainda) não está publicado no NPM, você pode instalá-lo local
 
 2.  **Entre na pasta do projeto:**
     ```bash
-    cd CL.IA
+    cd CLIA
     ```
 
 3.  **Instale as dependências:**
