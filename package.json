@@ -1,0 +1,27 @@
+{
+  "name": "minha-cli-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": ".src/index.js",
+  "type": "module",
+  "bin": {
+    "cli-teste": "./src/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.67.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.12.2",
+    "cli-table3": "^0.6.5",
+    "ignore": "^7.0.5",
+    "inquirer": "^12.10.0",
+    "openai": "^6.4.0",
+    "ora": "^9.0.0",
+    "yargs": "^17.7.2"
+  }
+}

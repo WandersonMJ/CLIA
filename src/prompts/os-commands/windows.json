@@ -1,0 +1,173 @@
+{
+  "description": "Uma lista de comandos úteis para desenvolvedores no ambiente Windows (CMD e PowerShell), com foco em programação e VS Code.",
+  "system_commands": {
+    "editor": "notepad"
+  },
+  "command_categories": [
+    {
+      "category_name": "Visual Studio Code",
+      "category_description": "Comandos para interagir com o VS Code diretamente do terminal.",
+      "commands": [
+        {
+          "command": "code .",
+          "description": "Abre o Visual Studio Code no diretório atual.",
+          "example": "Navegue até a pasta do seu projeto e digite: code ."
+        },
+        {
+          "command": "code <arquivo_ou_pasta>",
+          "description": "Abre um arquivo ou pasta específico no VS Code.",
+          "example": "code C:\\Projetos\\meu-app\\src\\index.js"
+        },
+        {
+          "command": "code --install-extension <id_da_extensao>",
+          "description": "Instala uma extensão do VS Code pelo seu ID.",
+          "example": "code --install-extension dbaeumer.vscode-eslint"
+        },
+        {
+          "command": "code --uninstall-extension <id_da_extensao>",
+          "description": "Desinstala uma extensão.",
+          "example": "code --uninstall-extension dbaeumer.vscode-eslint"
+        },
+        {
+          "command": "code --diff <arquivo1> <arquivo2>",
+          "description": "Abre uma visualização de comparação (diff) entre dois arquivos.",
+          "example": "code --diff versao-antiga.js versao-nova.js"
+        }
+      ]
+    },
+    {
+      "category_name": "Controle de Versão (Git)",
+      "category_description": "Comandos essenciais do Git para gerenciamento de código.",
+      "commands": [
+        {
+          "command": "git clone <url_do_repositorio>",
+          "description": "Cria uma cópia local de um repositório remoto.",
+          "example": "git clone https://github.com/usuario/projeto.git"
+        },
+        {
+          "command": "git status",
+          "description": "Mostra o estado atual do seu repositório (arquivos modificados, novos, etc).",
+          "example": "git status"
+        },
+        {
+          "command": "git add <arquivo>",
+          "description": "Adiciona um arquivo à área de preparação (staging) para o próximo commit.",
+          "example": "git add index.js (ou git add . para adicionar tudo)"
+        },
+        {
+          "command": "git commit -m \"Sua mensagem\"",
+          "description": "Salva as alterações preparadas no histórico do repositório.",
+          "example": "git commit -m \"Adiciona nova funcionalidade de login\""
+        },
+        {
+          "command": "git push",
+          "description": "Envia seus commits locais para o repositório remoto.",
+          "example": "git push origin main"
+        },
+        {
+          "command": "git pull",
+          "description": "Busca e mescla as alterações do repositório remoto para o seu local.",
+          "example": "git pull origin main"
+        },
+        {
+          "command": "git branch",
+          "description": "Lista, cria ou deleta branches (ramos de desenvolvimento).",
+          "example": "git branch nova-feature"
+        },
+        {
+          "command": "git checkout <nome_da_branch>",
+          "description": "Muda para a branch especificada.",
+          "example": "git checkout nova-feature"
+        }
+      ]
+    },
+    {
+      "category_name": "Gerenciamento de Pacotes (NPM - Node.js)",
+      "category_description": "Comandos para gerenciar dependências em projetos JavaScript/TypeScript.",
+      "commands": [
+        {
+          "command": "npm install <pacote>",
+          "description": "Instala um pacote (biblioteca). Use --save-dev para dependências de desenvolvimento.",
+          "example": "npm install express"
+        },
+        {
+          "command": "npm install",
+          "description": "Instala todas as dependências listadas no arquivo package.json.",
+          "example": "npm install"
+        },
+        {
+          "command": "npm run <script>",
+          "description": "Executa um script definido na seção 'scripts' do seu package.json.",
+          "example": "npm run dev"
+        },
+        {
+          "command": "npm uninstall <pacote>",
+          "description": "Remove um pacote do projeto.",
+          "example": "npm uninstall express"
+        },
+        {
+          "command": "npx <pacote>",
+          "description": "Executa um pacote do npm sem precisar instalá-lo globalmente.",
+          "example": "npx create-react-app meu-app"
+        }
+      ]
+    },
+    {
+      "category_name": "Gerenciamento de Arquivos e Diretórios",
+      "category_description": "Comandos básicos para navegar e manipular o sistema de arquivos.",
+      "commands": [
+        {
+          "command": "dir",
+          "description": "Lista os arquivos e pastas no diretório atual (equivalente ao 'ls' do Linux).",
+          "example": "dir"
+        },
+        {
+          "command": "cd <caminho>",
+          "description": "Muda o diretório atual.",
+          "example": "cd C:\\Projetos"
+        },
+        {
+          "command": "mkdir <nome_da_pasta>",
+          "description": "Cria um novo diretório.",
+          "example": "mkdir src"
+        },
+        {
+          "command": "del <arquivo>",
+          "description": "Deleta um arquivo.",
+          "example": "del arquivo_temporario.tmp"
+        },
+        {
+          "command": "rmdir /s /q <nome_da_pasta>",
+          "description": "Remove um diretório e todo o seu conteúdo de forma silenciosa.",
+          "example": "rmdir /s /q node_modules"
+        }
+      ]
+    },
+    {
+      "category_name": "Rede e Sistema (Útil para Debug)",
+      "category_description": "Comandos para verificar informações de rede e processos do sistema.",
+      "commands": [
+        {
+          "command": "ipconfig",
+          "description": "Mostra as configurações de rede do computador, incluindo o endereço IP.",
+          "example": "ipconfig"
+        },
+        {
+          "command": "netstat -ano | findstr \"<porta>\"",
+          "description": "Lista as conexões de rede e mostra qual processo está usando uma porta específica.",
+          "example": "netstat -ano | findstr \"3000\""
+        },
+        {
+          "command": "taskkill /F /PID <id_do_processo>",
+          "description": "Força o encerramento de um processo pelo seu ID (PID), útil para destravar portas.",
+          "example": "taskkill /F /PID 1234"
+        },
+        {
+          "command": "setx <VARIAVEL> \"<valor>\"",
+          "description": "Cria ou modifica uma variável de ambiente do usuário de forma permanente.",
+          "example": "setx NODE_ENV \"development\""
+        }
+      ]
+    }
+  ]
+}

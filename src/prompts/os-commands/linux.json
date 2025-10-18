@@ -1,0 +1,207 @@
+{
+  "description": "Uma lista de comandos úteis para desenvolvedores no ambiente Linux (Bash/Zsh), com foco em programação, gerenciamento de sistema e VS Code.",
+  "system_commands": {
+    "editor": "nano"
+  },
+  "command_categories": [
+    {
+      "category_name": "Visual Studio Code",
+      "category_description": "Comandos para interagir com o VS Code diretamente do terminal.",
+      "commands": [
+        {
+          "command": "code .",
+          "description": "Abre o Visual Studio Code no diretório atual.",
+          "example": "Navegue até a pasta do seu projeto e digite: code ."
+        },
+        {
+          "command": "code <arquivo_ou_pasta>",
+          "description": "Abre um arquivo ou pasta específico no VS Code.",
+          "example": "code ~/projetos/meu-app/src/index.js"
+        },
+        {
+          "command": "code --install-extension <id_da_extensao>",
+          "description": "Instala uma extensão do VS Code pelo seu ID.",
+          "example": "code --install-extension dbaeumer.vscode-eslint"
+        },
+        {
+          "command": "code --uninstall-extension <id_da_extensao>",
+          "description": "Desinstala uma extensão.",
+          "example": "code --uninstall-extension dbaeumer.vscode-eslint"
+        },
+        {
+          "command": "code --diff <arquivo1> <arquivo2>",
+          "description": "Abre uma visualização de comparação (diff) entre dois arquivos.",
+          "example": "code --diff versao-antiga.js versao-nova.js"
+        }
+      ]
+    },
+    {
+      "category_name": "Controle de Versão (Git)",
+      "category_description": "Comandos essenciais do Git. A funcionalidade é a mesma que no Windows.",
+      "commands": [
+        {
+          "command": "git clone <url>",
+          "description": "Cria uma cópia local de um repositório remoto."
+        },
+        {
+          "command": "git status",
+          "description": "Mostra o estado atual do repositório."
+        },
+        {
+          "command": "git add <arquivo>",
+          "description": "Adiciona um arquivo à área de preparação (staging)."
+        },
+        {
+          "command": "git commit -m \"mensagem\"",
+          "description": "Salva as alterações no histórico do repositório."
+        },
+        {
+          "command": "git push",
+          "description": "Envia os commits locais para o repositório remoto."
+        },
+        {
+          "command": "git pull",
+          "description": "Busca e mescla as alterações do repositório remoto."
+        },
+        {
+          "command": "git branch",
+          "description": "Lista, cria ou deleta branches."
+        },
+        {
+          "command": "git checkout <branch>",
+          "description": "Muda para a branch especificada."
+        }
+      ]
+    },
+    {
+      "category_name": "Gerenciamento de Pacotes (NPM - Node.js)",
+      "category_description": "Comandos para gerenciar dependências em projetos JavaScript/TypeScript. Funcionalidade idêntica à do Windows.",
+      "commands": [
+        {
+          "command": "npm install <pacote>",
+          "description": "Instala uma biblioteca. Use --save-dev para dependências de desenvolvimento."
+        },
+        {
+          "command": "npm install",
+          "description": "Instala todas as dependências do package.json."
+        },
+        {
+          "command": "npm run <script>",
+          "description": "Executa um script definido no package.json."
+        },
+        {
+          "command": "npx <pacote>",
+          "description": "Executa um pacote do npm sem instalá-lo globalmente."
+        }
+      ]
+    },
+    {
+      "category_name": "Gerenciamento de Arquivos e Diretórios",
+      "category_description": "Comandos essenciais para navegar e manipular o sistema de arquivos.",
+      "commands": [
+        {
+          "command": "ls -la",
+          "description": "Lista arquivos e diretórios com detalhes, incluindo permissões e arquivos ocultos.",
+          "example": "ls -la"
+        },
+        {
+          "command": "cd <caminho>",
+          "description": "Muda o diretório atual.",
+          "example": "cd ~/Documentos/Projetos"
+        },
+        {
+          "command": "mkdir -p <caminho/nova_pasta>",
+          "description": "Cria um novo diretório. A flag '-p' cria os diretórios pais se não existirem.",
+          "example": "mkdir -p ./src/components"
+        },
+        {
+          "command": "rm <arquivo>",
+          "description": "Remove (deleta) um arquivo.",
+          "example": "rm temp.log"
+        },
+        {
+          "command": "rm -rf <diretorio>",
+          "description": "Remove um diretório e todo o seu conteúdo de forma recursiva e forçada. **Use com cuidado!**",
+          "example": "rm -rf ./dist"
+        },
+        {
+          "command": "touch <arquivo>",
+          "description": "Cria um arquivo vazio ou atualiza sua data de modificação se ele já existir.",
+          "example": "touch .env"
+        },
+        {
+          "command": "cp <origem> <destino>",
+          "description": "Copia um arquivo. Use '-r' para copiar diretórios.",
+          "example": "cp config.example.js config.js"
+        },
+        {
+          "command": "mv <origem> <destino>",
+          "description": "Move ou renomeia um arquivo ou diretório.",
+          "example": "mv antigo_nome.js novo_nome.js"
+        },
+        {
+          "command": "find . -name \"*.js\"",
+          "description": "Encontra arquivos com base em critérios, como nome.",
+          "example": "find . -name \"*.js\""
+        }
+      ]
+    },
+    {
+      "category_name": "Permissões e Usuários",
+      "category_description": "Comandos para gerenciar permissões de arquivos, essenciais em ambientes de servidor.",
+      "commands": [
+        {
+          "command": "chmod +x <script.sh>",
+          "description": "Torna um arquivo executável.",
+          "example": "chmod +x deploy.sh"
+        },
+        {
+          "command": "chown <usuario>:<grupo> <arquivo>",
+          "description": "Muda o proprietário e o grupo de um arquivo ou diretório.",
+          "example": "sudo chown www-data:www-data /var/www/html"
+        },
+        {
+          "command": "sudo <comando>",
+          "description": "Executa um comando com privilégios de superusuário (administrador).",
+          "example": "sudo apt-get update"
+        }
+      ]
+    },
+    {
+      "category_name": "Rede e Processos",
+      "category_description": "Comandos para inspecionar processos, redes e logs do sistema.",
+      "commands": [
+        {
+          "command": "ip a",
+          "description": "Mostra as configurações de rede e endereços IP (alternativa moderna ao 'ifconfig').",
+          "example": "ip a"
+        },
+        {
+          "command": "lsof -i :<porta>",
+          "description": "Lista qual processo está usando uma porta de rede específica.",
+          "example": "sudo lsof -i :3000"
+        },
+        {
+          "command": "kill <PID>",
+          "description": "Envia um sinal para terminar um processo pelo seu ID (PID). Use '-9' para forçar.",
+          "example": "kill -9 1234"
+        },
+        {
+          "command": "ps aux | grep <nome_do_processo>",
+          "description": "Procura por processos em execução que correspondam a um nome.",
+          "example": "ps aux | grep 'node'"
+        },
+        {
+          "command": "tail -f <arquivo_de_log>",
+          "description": "Exibe as últimas linhas de um arquivo em tempo real, muito útil para acompanhar logs.",
+          "example": "tail -f /var/log/nginx/error.log"
+        },
+        {
+          "command": "export VARIAVEL=\"valor\"",
+          "description": "Define uma variável de ambiente para a sessão atual do terminal.",
+          "example": "export NODE_ENV=development"
+        }
+      ]
+    }
+  ]
+}

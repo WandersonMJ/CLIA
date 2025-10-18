@@ -1,0 +1,64 @@
+# Dependências
+node_modules/
+package-lock.json
+
+# Variáveis de Ambiente
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+.env.test
+
+# Configurações Locais
+config.json
+config.*.json
+*.config.local.json
+
+# Logs e Arquivos Temporários
+*.log
+logs/
+agent-log.txt
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Árvores de Arquivos e Outputs
+*-tree.json
+application-tree.json
+tree.json
+*.tree.json
+
+# Arquivos de Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Build e Dist
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Arquivos Temporários
+tmp/
+temp/
+*.tmp
+*.bak
+*.cache
+
+# Testes e Coverage
+coverage/
+.nyc_output/
+*.test.local.*
