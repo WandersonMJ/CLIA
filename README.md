@@ -20,7 +20,7 @@ Como o projeto (ainda) não está publicado no NPM, você pode instalá-lo local
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/WandersonMJ/CL.IA.git](https://github.com/WandersonMJ/CL.IA.git)
+    git clone [https://github.com/WandersonMJ/CLIA.git](https://github.com/WandersonMJ/CLIA.git)
     ```
 
 2.  **Entre na pasta do projeto:**
