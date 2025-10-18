@@ -14,6 +14,38 @@ Integre e alterne fluidamente entre as principais APIs de IA — **OpenAI (GPT)*
 * **Configuração Rápida:** Um setup inicial interativo guia você na configuração de chaves, modelos e preferências (como modo de economia de tokens).
 * **Estrutura Modular:** Código limpo e organizado, facilitando a expansão com novas ferramentas ou provedores de IA.
 
+## 🚀 Como Usar (Instalação Local)
+
+Como o projeto (ainda) não está publicado no NPM, você pode instalá-lo localmente para usar ou contribuir:
+
+1.  **Clone o repositório:**
+    ```bash
+    git clone [https://github.com/SEU-USUARIO/CL.IA.git](https://github.com/SEU-USUARIO/CL.IA.git)
+    ```
+
+2.  **Entre na pasta do projeto:**
+    ```bash
+    cd CL.IA
+    ```
+
+3.  **Instale as dependências:**
+    ```bash
+    npm install
+    ```
+
+4.  **Crie o "link" local:**
+    (Este comando torna o `clia` disponível globalmente no seu sistema, apontando para esta pasta)
+    ```bash
+    npm link
+    ```
+
+5.  **Execute!**
+    Agora você pode chamar a CLI de qualquer lugar do seu computador:
+    ```bash
+    clia
+    ```
+    *Na primeira vez, a aplicação iniciará o assistente de configuração (comando `config`).*
+
 ## 🛠️ Comandos Principais
 
 | Comando | Descrição |
