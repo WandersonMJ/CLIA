@@ -21,7 +21,9 @@ export const CRITICAL_ACTIONS = [
     'INSERT_LINES', 
     'REPLACE_IN_FILE', 
     'CREATE_WITH_CONTENT', 
-    'MOVE'
+    'MOVE',
+    'APPLY_PATCH',
+    'CREATE_DIRECTORY',
 ];
 
 // --- Configuração ---
@@ -66,6 +68,7 @@ export const OPENAI_MODELS = [
     { name: 'GPT-4o Mini', value: 'gpt-4o-mini' },
     { name: 'GPT-4o', value: 'gpt-4o' },
     { name: 'GPT-4 Turbo', value: 'gpt-4-turbo' },
+    { name: 'GPT-5 nano', value: 'gpt-5-nano-2025-08-07'}
 ];
 
 // --- Valores Padrão dos Modelos ---

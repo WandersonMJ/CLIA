@@ -1,3 +1,22 @@
+const applyPatch = {
+  name: "APPLY_PATCH",
+  description: "Aplica um patch de formato 'diff' a um arquivo existente. Esta é a forma PREFERIDA para modificações complexas.",
+  input_schema: {
+    type: "object",
+    properties: {
+      filePath: {
+        type: "string",
+        description: "O caminho relativo do arquivo a ser modificado (ex: 'src/service.js').",
+      },
+      patchContent: {
+        type: "string",
+        description: "O patch no formato 'unified diff' (começando com '--- a/...' e '+++ b/...').",
+      },
+    },
+    required: ["filePath", "patchContent"],
+  },
+};
+
 const readFile = {
   name: "READ",
   description: "Lê o conteúdo completo de um único arquivo no sistema.",
@@ -218,6 +237,21 @@ const updateFile = {
   },
 };
 
+const createDirectory = {
+  name: "CREATE_DIRECTORY",
+  description: "Cria um novo diretório (pasta). Cria diretórios pais se não existirem.",
+  input_schema: {
+    type: "object",
+    properties: {
+      dirPath: {
+        type: "string",
+        description: "O caminho relativo do diretório a ser criado (ex: 'src/nova-pasta/componentes').",
+      },
+    },
+    required: ["dirPath"],
+  },
+};
+
 export function getTools(isEconomyMode) {
   const commonTools = [
     createFile,
@@ -227,8 +261,10 @@ export function getTools(isEconomyMode) {
     editLines,
     insertLines,
     replaceInFile,
+    applyPatch,
     shell,
-    updateFile
+    updateFile,
+    createDirectory,
   ];
 
   if (isEconomyMode) {

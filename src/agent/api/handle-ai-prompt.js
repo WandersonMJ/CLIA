@@ -98,6 +98,7 @@ function getToolImplementation(toolName) {
         'READ': fsActions.readFile,
         'READ_START': fsActions.readStartOfFile,
         'READ_END': fsActions.readEndOfFile,
+        'CREATE_DIRECTORY': fsActions.createDirectory,
         'CREATE': fsActions.createFile,
         'CREATE_WITH_CONTENT': fsActions.createFileWithContent,
         'DELETE': fsActions.deleteFile,
@@ -106,6 +107,7 @@ function getToolImplementation(toolName) {
         'INSERT_LINES': fsActions.insertLines,
         'REPLACE_IN_FILE': fsActions.replaceInFile,
         'SHELL': executeShellCommand,
+        'APPLY_PATCH': fsActions.applyPatchToFile,
         'UPDATE': fsActions.updateFile,
     };
     return toolMap[toolName];

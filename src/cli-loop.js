@@ -12,6 +12,8 @@ import fs from 'fs';
 import session from './services/api-session.js';
 import { OS_PROMPTS_DIR } from './config/constants.js';
 
+import { startTUI } from './TUI/index.js';
+
 /**
  * Busca o comando do editor padrão no arquivo JSON do SO.
  * @returns {string} O comando do editor (ex: 'nano' ou 'notepad').
@@ -111,6 +113,7 @@ async function loopPrincipal() {
 
       default:
         if (input) {
+          // Enviar para a camada IA para gerar resposta ou tool_calls
           await handleAiPrompt(input);
         }
         break;
@@ -125,3 +128,4 @@ async function loopPrincipal() {
 }
 
 export default loopPrincipal;
+
