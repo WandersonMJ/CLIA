@@ -12,7 +12,7 @@ import fs from 'fs';
 import session from './services/api-session.js';
 import { OS_PROMPTS_DIR } from './config/constants.js';
 
-import { startTUI } from './TUI/index.js';
+import { startTUI } from './TUI/loader.js';
 
 /**
  * Busca o comando do editor padrão no arquivo JSON do SO.
@@ -100,6 +100,18 @@ async function loopPrincipal() {
       case 'help':
         console.clear()
         cliUi.mostrarComandos();
+        break;
+
+      case 'tui':
+        try {
+          console.clear();
+          logger.info('Iniciando TUI (Terminal User Interface)...');
+          await startTUI();
+          console.clear();
+          logger.info('TUI encerrado. Voltando ao CLI clássico...');
+        } catch (error) {
+          logger.error('Erro ao iniciar TUI:', error.message);
+        }
         break;
 
       case 'edit-constants':

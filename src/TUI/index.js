@@ -1,49 +1,32 @@
 // src/TUI/index.js
-import inquirer from 'inquirer';
+import React from 'react';
+import { render } from 'ink';
+import App from './App.js';
 
-async function showMainMenu() {
-  const choices = [
-    { name: 'Iniciar interface', value: 'start' },
-    { name: 'Mostrar status', value: 'status' },
-    { name: 'Sair', value: 'exit' }
-  ];
-  const { action } = await inquirer.prompt({
-    type: 'list',
-    name: 'action',
-    message: 'TUI - Escolha uma ação',
-    choices
-  });
-  return action;
+/**
+ * Inicia o TUI (Terminal User Interface) usando Ink + React
+ */
+export async function startTUI() {
+	try {
+		// Ativar modo TUI para silenciar logger
+		process.env.CLIA_TUI_MODE = 'true';
+
+		// Renderiza o App com Ink
+		const { waitUntilExit } = render(<App />);
+
+		// Aguarda até o usuário sair
+		await waitUntilExit();
+
+		// Desativar modo TUI
+		process.env.CLIA_TUI_MODE = 'false';
+
+		// console.log('\nEncerrando TUI...');
+	} catch (error) {
+		// Desativar modo TUI em caso de erro
+		process.env.CLIA_TUI_MODE = 'false';
+		// console.error('Erro ao iniciar TUI:', error);
+		throw error;
+	}
 }
 
-async function startTUI() {
-  console.clear();
-  console.log('CLIA TUI - Terminal User Interface (prototype)');
-  let running = true;
-  while (running) {
-    const action = await showMainMenu();
-    if (action === 'start') {
-      console.log('Iniciando as integrações de IA (em desenvolvimento)...');
-      const { provider } = await inquirer.prompt({
-        type: 'list',
-        name: 'provider',
-        message: 'Selecione um provedor de IA',
-        choices: [
-          { name: 'OpenAI (GPT)', value: 'openai' },
-          { name: 'Gemini', value: 'gemini' },
-          { name: 'Claude', value: 'claude' },
-          { name: 'Voltar', value: 'back' }
-        ]
-      });
-      if (provider === 'back') continue;
-      console.log(`Provedor selecionado: ${provider} ( integração ainda não implementada ).`);
-    } else if (action === 'status') {
-      console.log('Status: TUI em modo protótipo. Sem estado persistente.');
-    } else if (action === 'exit') {
-      running = false;
-    }
-  }
-  console.log('Encerrando TUI...');
-}
-
-export { startTUI };
+export default startTUI;
