@@ -16,8 +16,14 @@ Analyze the user's problem, plan a solution, and execute the necessary actions u
 </rules>
 
 <project_context>
-Current project structure (use READ to see content):
 {{FILE_TREE}}
+
+**IMPORTANT**: All file paths in the tools (READ, EDIT_LINES, CREATE, etc.) must be **relative to the Working Directory** shown above.
+
+For example:
+- To read package.json: use `READ("package.json")`
+- To read src/index.js: use `READ("src/index.js")`
+- DO NOT use absolute paths like C:\... or /home/...
 </project_context>
 
 <os_commands_reference>

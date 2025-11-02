@@ -216,6 +216,176 @@ async function escolherProvedorIA(config, reuseKeys = true) {
     };
 }
 
+async function selecionarModo(config) {
+    logger.info('🎯 Selecionar Modo de Operação');
+
+    const { mode } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'mode',
+            message: 'Escolha o modo de operação:',
+            choices: [
+                {
+                    name: '🔵 Normal - Usa o modelo configurado sem otimizações',
+                    value: 'normal'
+                },
+                {
+                    name: '💰 Econômico - Reduz custos limitando ferramentas disponíveis',
+                    value: 'economy'
+                },
+                {
+                    name: '🏗️  Arquiteto - Multi-agente (Planejador + Executor) para tarefas complexas',
+                    value: 'architect'
+                },
+            ],
+            default: config.mode || 'normal',
+        },
+    ]);
+
+    session.setMode(mode);
+
+    if (mode === 'normal') {
+        logger.success('✅ Modo Normal ativado');
+        return { mode: 'normal' };
+    }
+
+    if (mode === 'economy') {
+        logger.success('✅ Modo Econômico ativado');
+        logger.info('💡 Ferramentas limitadas serão usadas para reduzir custos');
+        return { mode: 'economy' };
+    }
+
+    // Se for modo arquiteto, configurar
+    if (mode === 'architect') {
+        return await configurarModoArquiteto(config);
+    }
+}
+
+async function configurarModoArquiteto(config) {
+    logger.info('🏗️  Configurando Modo Arquiteto (Multi-Agent)');
+
+    logger.info('\n🏛️  Configurando o ARQUITETO (IA de Planejamento - Modelo Caro e Inteligente)');
+
+    // Escolher provider do Arquiteto
+    const { architectProvider } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'architectProvider',
+            message: 'Escolha o provedor para o Arquiteto:',
+            choices: [
+                { name: 'OpenAI (GPT-4o)', value: 'openai' },
+                { name: 'Claude (Opus)', value: 'claude' },
+                { name: 'Gemini', value: 'gemini' },
+            ],
+            default: config.architectProvider || 'openai',
+        },
+    ]);
+
+    // Escolher modelo do Arquiteto
+    let architectModelChoices;
+    let architectDefaultModel;
+    if (architectProvider === 'openai') {
+        architectModelChoices = OPENAI_MODELS;
+        architectDefaultModel = config.architectModel || 'gpt-4o';
+    } else if (architectProvider === 'claude') {
+        architectModelChoices = CLAUDE_MODELS;
+        architectDefaultModel = config.architectModel || 'claude-opus-4-20250514';
+    } else {
+        architectModelChoices = GEMINI_MODELS;
+        architectDefaultModel = config.architectModel || 'gemini-2.0-flash-exp';
+    }
+
+    const { architectModel } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'architectModel',
+            message: 'Escolha o modelo para o Arquiteto:',
+            choices: architectModelChoices,
+            default: architectDefaultModel,
+        },
+    ]);
+
+    // API Key do Arquiteto
+    const { architectApiKey } = await inquirer.prompt([
+        {
+            type: 'password',
+            name: 'architectApiKey',
+            message: `API Key do ${architectProvider} para o Arquiteto:`,
+            default: config.architectApiKey || '',
+        },
+    ]);
+
+    logger.info('\n👷 Configurando o EXECUTOR (IA de Execução - Modelo Barato e Rápido)');
+
+    // Escolher provider do Executor
+    const { executorProvider } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'executorProvider',
+            message: 'Escolha o provedor para o Executor:',
+            choices: [
+                { name: 'Claude (Haiku)', value: 'claude' },
+                { name: 'Gemini (Flash)', value: 'gemini' },
+                { name: 'OpenAI (GPT-4o-mini)', value: 'openai' },
+            ],
+            default: config.executorProvider || 'claude',
+        },
+    ]);
+
+    // Escolher modelo do Executor
+    let executorModelChoices;
+    let executorDefaultModel;
+    if (executorProvider === 'claude') {
+        executorModelChoices = CLAUDE_MODELS;
+        executorDefaultModel = config.executorModel || 'claude-haiku-3-5-20250120';
+    } else if (executorProvider === 'gemini') {
+        executorModelChoices = GEMINI_MODELS;
+        executorDefaultModel = config.executorModel || 'gemini-2.0-flash-exp';
+    } else {
+        executorModelChoices = OPENAI_MODELS;
+        executorDefaultModel = config.executorModel || 'gpt-4o-mini';
+    }
+
+    const { executorModel } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'executorModel',
+            message: 'Escolha o modelo para o Executor:',
+            choices: executorModelChoices,
+            default: executorDefaultModel,
+        },
+    ]);
+
+    // API Key do Executor
+    const { executorApiKey } = await inquirer.prompt([
+        {
+            type: 'password',
+            name: 'executorApiKey',
+            message: `API Key do ${executorProvider} para o Executor:`,
+            default: config.executorApiKey || '',
+        },
+    ]);
+
+    // Configurar session
+    session.setMode('architect');
+    session.configureArchitect(architectProvider, architectModel, architectApiKey);
+    session.configureExecutor(executorProvider, executorModel, executorApiKey);
+
+    logger.success('✅ Modo Arquiteto configurado com sucesso!');
+    logger.info(`🏛️  Arquiteto: ${architectProvider} (${architectModel})`);
+    logger.info(`👷 Executor: ${executorProvider} (${executorModel})`);
+
+    return {
+        mode: 'architect',
+        architectProvider,
+        architectModel,
+        architectApiKey,
+        executorProvider,
+        executorModel,
+        executorApiKey
+    };
+}
+
 async function loopConfiguracao() {
     const config = readConfig() || {};
 
@@ -243,35 +413,29 @@ async function loopConfiguracao() {
     session.setOS(os.toLowerCase());
     logger.info(lang.get('config.osSet', os));
 
-    const { economyMode } = await inquirer.prompt([
-        {
-            type: 'confirm',
-            name: 'economyMode',
-            message: lang.get('config.economyPrompt'),
-            default: config.economyMode || false,
-        },
-    ]);
-    session.setEconomyMode(economyMode);
-    if (economyMode) {
-        logger.success(lang.get('config.economyOn'));
-    }
-
     logger.info(lang.get('config.iaSetup'));
     const configuracaoIA = await escolherProvedorIA(config, false);
 
-    if (configuracaoIA) {
-        const newConfig = {
-            language,
-            os,
-            economyMode,
-            provider: configuracaoIA.provider,
-            apiKey: configuracaoIA.apiKey,
-            model: configuracaoIA.model,
-            credentials: configuracaoIA.credentials
-        };
-        writeConfig(newConfig);
-        logger.success(lang.get('config.providerSuccess', configuracaoIA.provider));
+    if (!configuracaoIA) {
+        logger.error('Falha ao configurar provedor de IA');
+        return;
     }
+
+    // Selecionar modo de operação
+    const modeConfig = await selecionarModo(config);
+
+    const newConfig = {
+        language,
+        os,
+        provider: configuracaoIA.provider,
+        apiKey: configuracaoIA.apiKey,
+        model: configuracaoIA.model,
+        credentials: configuracaoIA.credentials,
+        ...modeConfig
+    };
+
+    writeConfig(newConfig);
+    logger.success(lang.get('config.providerSuccess', configuracaoIA.provider));
 }
 
 async function ajustarConfiguracoes() {
@@ -298,7 +462,7 @@ async function ajustarConfiguracoes() {
             message: lang.get('config.adjustPrompt'),
             choices: [
                 { name: lang.get('config.adjustOptions.provider'), value: 'provider' },
-                { name: lang.get('config.adjustOptions.economy'), value: 'economy' },
+                { name: '🎯 Selecionar Modo (Normal/Econômico/Arquiteto)', value: 'mode' },
                 { name: lang.get('config.adjustOptions.os'), value: 'os' },
                 { name: 'Change Language / Mudar Idioma', value: 'language' },
                 { name: lang.get('config.adjustOptions.all'), value: 'all' },
@@ -318,22 +482,9 @@ async function ajustarConfiguracoes() {
                 newConfig.credentials = configuracaoIA.credentials;
             }
             break;
-        case 'economy':
-            const { economyMode } = await inquirer.prompt([
-                {
-                    type: 'confirm',
-                    name: 'economyMode',
-                    message: lang.get('config.economyPrompt'),
-                    default: config.economyMode || false,
-                },
-            ]);
-            newConfig.economyMode = economyMode;
-            session.setEconomyMode(economyMode);
-            if (economyMode) {
-                logger.success(lang.get('config.economyOn'));
-            } else {
-                logger.info(lang.get('config.economyOff'));
-            }
+        case 'mode':
+            const modeConfig = await selecionarModo(config);
+            newConfig = { ...newConfig, ...modeConfig };
             break;
         case 'os':
             const { os } = await inquirer.prompt([
@@ -371,17 +522,6 @@ async function ajustarConfiguracoes() {
             newConfig.os = osAll;
             session.setOS(osAll.toLowerCase());
 
-            const { economyModeAll } = await inquirer.prompt([
-                {
-                    type: 'confirm',
-                    name: 'economyModeAll',
-                    message: lang.get('config.economyPrompt'),
-                    default: config.economyMode || false,
-                },
-            ]);
-            newConfig.economyMode = economyModeAll;
-            session.setEconomyMode(economyModeAll);
-
             const configuracaoIAAll = await escolherProvedorIA(config, true);
             if (configuracaoIAAll) {
                 newConfig.provider = configuracaoIAAll.provider;
@@ -389,6 +529,11 @@ async function ajustarConfiguracoes() {
                 newConfig.model = configuracaoIAAll.model;
                 newConfig.credentials = configuracaoIAAll.credentials;
             }
+
+            // Selecionar modo de operação
+            const modeConfigAll = await selecionarModo(config);
+            newConfig = { ...newConfig, ...modeConfigAll };
+
             break;
     }
     writeConfig(newConfig);

@@ -10,8 +10,8 @@ export const PROMPTS_DIR = 'src/prompts';
 export const OS_PROMPTS_DIR = `${PROMPTS_DIR}/os-commands`;
 
 // --- Agente ---
-export const MAX_ITERATIONS = 15;
-export const LOG_PREVIEW_LENGTH = 300;
+export const MAX_ITERATIONS = 200;
+export const LOG_PREVIEW_LENGTH = 100;
 export const CRITICAL_ACTIONS = [
     'CREATE', 
     'UPDATE', 

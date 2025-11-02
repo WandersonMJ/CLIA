@@ -10,6 +10,7 @@ import { getTools } from './tools/filesystem-tools.js';
 import logger from '../../utils/logger.js';
 import lang from '../../services/language-service.js';
 import ora from 'ora';
+import architectOrchestrator from '../architect-orchestrator.js';
 
 import {
     MAX_ITERATIONS,
@@ -60,11 +61,12 @@ function getSystemPrompt() {
 
         let promptTemplate = fs.readFileSync(promptTemplatePath, 'utf8');
 
+        const currentWorkingDir = process.cwd();
         const fileTree = generateFileTree('.');
         const fileTreeString = JSON.stringify(fileTree, null, 2);
         const osCommands = getOsCommands();
 
-        promptTemplate = promptTemplate.replace('{{FILE_TREE}}', fileTreeString);
+        promptTemplate = promptTemplate.replace('{{FILE_TREE}}', `Working Directory: ${currentWorkingDir}\n\n${fileTreeString}`);
         promptTemplate = promptTemplate.replace('{{OS_COMMANDS}}', osCommands);
 
         return promptTemplate;
@@ -116,6 +118,13 @@ function getToolImplementation(toolName) {
 async function handleAiPrompt(userInput) {
     clearPartialCache();
 
+    // Se o Modo Arquiteto estiver ativado, usar o orquestrador
+    if (session.isArchitectMode()) {
+        logger.info('🎯 Modo Arquiteto detectado. Iniciando orquestração...');
+        return await architectOrchestrator.orchestrate(userInput);
+    }
+
+    // Modo normal (single-agent)
     if (conversationHistory.length === 0) {
         conversationHistory = [
             { role: 'system', content: getSystemPrompt() }
