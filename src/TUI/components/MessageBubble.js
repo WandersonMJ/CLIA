@@ -53,4 +53,5 @@ export const MessageBubble = ({ role, content }) => {
 	);
 };
 
-export default MessageBubble;
+// Correção: Envolve o componente com React.memo
+export default React.memo(MessageBubble);

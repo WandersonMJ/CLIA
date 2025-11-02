@@ -2187,13 +2187,6 @@ async function sendPromptToAI(userMessage, history = [], onToolCall = null, onPe
         }
         const toolName = toolCall.function.name;
         const toolArgs = JSON.parse(toolCall.function.arguments);
-        if (onToolCall) {
-          onToolCall({
-            name: toolName,
-            arguments: toolArgs,
-            id: toolCall.id
-          });
-        }
         if (CRITICAL_ACTIONS.includes(toolName)) {
           const action = TOOL_TO_ACTION_MAP[toolName];
           const hasPermission = sessionPermissions && sessionPermissions[action] === true;
@@ -2346,7 +2339,7 @@ var MessageBubble = ({ role, content }) => {
     }
   );
 };
-var MessageBubble_default = MessageBubble;
+var MessageBubble_default = React6.memo(MessageBubble);
 
 // src/TUI/components/ToolCallDisplay.js
 import React7 from "react";
@@ -2395,7 +2388,7 @@ var ToolCallDisplay = ({ name, arguments: args, result, status = "pending" }) =>
     }
   );
 };
-var ToolCallDisplay_default = ToolCallDisplay;
+var ToolCallDisplay_default = React7.memo(ToolCallDisplay);
 
 // src/TUI/components/LoadingSpinner.js
 import React8 from "react";
@@ -2531,25 +2524,14 @@ var ChatPage = () => {
     }
   }, [isLoading, pendingPermission, addMessage, goBack]);
   const handleToolCall = useCallback4((toolCall) => {
-    setCurrentToolCalls((prev) => {
-      const existingIndex = prev.findIndex((t) => t.id === toolCall.id);
-      if (existingIndex >= 0) {
-        const updated = [...prev];
-        updated[existingIndex] = {
-          ...updated[existingIndex],
-          ...toolCall,
-          result: toolCall.result || updated[existingIndex].result
-        };
-        return updated;
+    setCurrentToolCalls((prev) => [
+      ...prev,
+      {
+        ...toolCall,
+        // Garantir que o status não seja 'executing' (que vinha da lógica antiga)
+        status: toolCall.status || (toolCall.result?.success ? "success" : "error")
       }
-      return [
-        ...prev,
-        {
-          ...toolCall,
-          status: toolCall.status || "executing"
-        }
-      ];
-    });
+    ]);
   }, []);
   const handlePermissionRequest = useCallback4((action, details) => {
     return new Promise((resolve) => {

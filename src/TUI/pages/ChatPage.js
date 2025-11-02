@@ -61,29 +61,17 @@ export const ChatPage = () => {
 	}, [isLoading, pendingPermission, addMessage, goBack]);
 
 	const handleToolCall = useCallback((toolCall) => {
-		// Adicionar tool call à lista de exibição
-		setCurrentToolCalls((prev) => {
-			// Atualizar ferramenta existente ou adicionar nova
-			const existingIndex = prev.findIndex((t) => t.id === toolCall.id);
-			if (existingIndex >= 0) {
-				// Atualizar ferramenta existente (provavelmente com resultado)
-				const updated = [...prev];
-				updated[existingIndex] = {
-					...updated[existingIndex],
-					...toolCall,
-					result: toolCall.result || updated[existingIndex].result,
-				};
-				return updated;
-			}
-			// Adicionar nova ferramenta
-			return [
-				...prev,
-				{
-					...toolCall,
-					status: toolCall.status || 'executing',
-				},
-			];
-		});
+		// [CORREÇÃO] Agora onToolCall só é chamado UMA VEZ, já com o resultado.
+		// Não precisamos mais da lógica de "atualizar" um item existente.
+		// Apenas adicionamos a ferramenta concluída.
+		setCurrentToolCalls((prev) => [
+			...prev,
+			{
+				...toolCall,
+				// Garantir que o status não seja 'executing' (que vinha da lógica antiga)
+				status: toolCall.status || (toolCall.result?.success ? 'success' : 'error'),
+			},
+		]);
 	}, []);
 
 	const handlePermissionRequest = useCallback((action, details) => {

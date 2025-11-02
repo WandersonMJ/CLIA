@@ -63,4 +63,5 @@ export const ToolCallDisplay = ({ name, arguments: args, result, status = 'pendi
 	);
 };
 
-export default ToolCallDisplay;
+// Correção: Envolve o componente com React.memo
+export default React.memo(ToolCallDisplay);

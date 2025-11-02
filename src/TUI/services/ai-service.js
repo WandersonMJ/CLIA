@@ -216,14 +216,14 @@ export async function sendPromptToAI(
 				const toolName = toolCall.function.name;
 				const toolArgs = JSON.parse(toolCall.function.arguments);
 
-				// Notificar sobre tool call
-				if (onToolCall) {
-					onToolCall({
-						name: toolName,
-						arguments: toolArgs,
-						id: toolCall.id,
-					});
-				}
+				// [CORREÇÃO] Notificação removida daqui.
+				// if (onToolCall) {
+				// 	onToolCall({
+				// 		name: toolName,
+				// 		arguments: toolArgs,
+				// 		id: toolCall.id,
+				// 	});
+				// }
 
 				// Verificar se é ação crítica e precisa de permissão
 				if (CRITICAL_ACTIONS.includes(toolName)) {
@@ -288,7 +288,7 @@ export async function sendPromptToAI(
 					content: JSON.stringify(toolResult),
 				});
 
-				// Notificar sobre resultado
+				// [CORREÇÃO] Notificar sobre resultado (APENAS AQUI)
 				if (onToolCall) {
 					onToolCall({
 						name: toolName,
