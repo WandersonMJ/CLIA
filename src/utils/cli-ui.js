@@ -1,7 +1,26 @@
 import Table from 'cli-table3';
 import readline from 'readline';
-import logger from './logger.js'; 
+import logger from './logger.js';
 import lang from '../services/language-service.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * Exibe o ASCII art do CLIA na inicialização
+ */
+function mostrarArteInicial() {
+  try {
+    const artPath = path.join(__dirname, '..', 'arts', 'clia.txt');
+    const asciiArt = fs.readFileSync(artPath, 'utf8');
+    logger.raw(asciiArt);
+  } catch (error) {
+    logger.warn('Não foi possível exibir a arte do CLIA', error);
+  }
+}
 
 /**
  * Exibe a tabela de comandos disponíveis, traduzida.
@@ -30,11 +49,12 @@ function mostrarComandos() {
 }
 
 const COMANDOS = [
-  'sair', 
-  'exit', 
-  'scrap', 
-  'config', 
-  'help', 
+  'sair',
+  'exit',
+  'scrap',
+  'config',
+  'help',
+  '/help',
   'edit-constants'
 ];
 
@@ -85,6 +105,7 @@ async function promptMultiline() {
 }
 
 export default {
+    mostrarArteInicial,
     mostrarComandos,
     promptMultiline
 };

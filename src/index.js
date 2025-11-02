@@ -23,8 +23,8 @@ function inicializarSessao() {
     session.setLanguage(config.language);
     lang.setLanguage(config.language);
   }
-  
-  cliUi.mostrarComandos(); 
+
+  cliUi.mostrarArteInicial(); 
   
   if (config.provider && config.apiKey) {
     logger.info(lang.get('config.previousConfigs')); 

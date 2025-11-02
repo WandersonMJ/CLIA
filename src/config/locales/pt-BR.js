@@ -132,9 +132,9 @@ export default {
     },
     client: {
         init: {
-            claude: "Cliente Anthropic (Claude) inicializado com o modelo: {0}",
-            gemini: "Cliente Gemini inicializado com o modelo: {0}",
-            openai: "Cliente OpenAI inicializado com o modelo: {0}"
+            claude: "Cliente Anthropic (Claude) inicializado com o modelo: {0}\n",
+            gemini: "Cliente Gemini inicializado com o modelo: {0}\n",
+            openai: "Cliente OpenAI inicializado com o modelo: {0}\n"
         },
         gemini: {
             emptyWarn: "Gemini retornou resposta vazia ou bloqueada:",

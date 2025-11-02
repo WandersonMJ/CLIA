@@ -12,8 +12,6 @@ import fs from 'fs';
 import session from './services/api-session.js';
 import { OS_PROMPTS_DIR } from './config/constants.js';
 
-import { startTUI } from './TUI/index.js';
-
 /**
  * Busca o comando do editor padrão no arquivo JSON do SO.
  * @returns {string} O comando do editor (ex: 'nano' ou 'notepad').
@@ -98,6 +96,7 @@ async function loopPrincipal() {
         await configService.ajustarConfiguracoes();
         break;
       case 'help':
+      case '/help':
         console.clear()
         cliUi.mostrarComandos();
         break;
