@@ -5,7 +5,7 @@ import claudeClient from '../agent/api/ai/claude-client.js';
 import { gzipSync } from 'zlib';
 
 // Opção A: compressão de contexto antes de enviar aos provedores de IA
-const CONTEXT_COMPRESSION_ENABLED = true;
+const CONTEXT_COMPRESSION_ENABLED = false;
 const CONTEXT_COMPRESSION_SIZE_THRESHOLD = 4000; // caracteres
 function compressContext(history) {
   const allText = (history || []).map((m) => m.content || '').join('\n');

@@ -11,6 +11,7 @@ import logger from '../../utils/logger.js';
 import lang from '../../services/language-service.js';
 import ora from 'ora';
 import architectOrchestrator from '../architect-orchestrator.js';
+import interruptionHandler from '../../utils/interruption-handler.js';
 
 import {
     MAX_ITERATIONS,
@@ -137,8 +138,19 @@ async function handleAiPrompt(userInput) {
 
     let iterationCount = 0;
 
+    // Ativar o listener de interrupção (ESC)
+    interruptionHandler.reset();
+    interruptionHandler.startListening();
+
     while (iterationCount < MAX_ITERATIONS) {
         iterationCount++;
+
+        // Verificar se houve interrupção via ESC
+        if (interruptionHandler.isInterrupted()) {
+            logger.warn(lang.get('agent.interrupted') || '⚠️  Processamento interrompido pelo usuário.');
+            interruptionHandler.stopListening();
+            return;
+        }
 
         logger.iteration(lang.get('agent.iteration', iterationCount, MAX_ITERATIONS));
 
@@ -146,11 +158,29 @@ async function handleAiPrompt(userInput) {
         let aiMessage;
 
         try {
+            // Wrapper para verificar interrupção durante a chamada da IA
+            const checkInterruptionInterval = setInterval(() => {
+                if (interruptionHandler.isInterrupted()) {
+                    spinner.stop();
+                    clearInterval(checkInterruptionInterval);
+                }
+            }, 100); // Verifica a cada 100ms
+
             aiMessage = await aiService.sendPrompt(conversationHistory, availableTools);
+
+            clearInterval(checkInterruptionInterval);
             spinner.stop();
+
+            // Verificar novamente após a chamada
+            if (interruptionHandler.isInterrupted()) {
+                logger.warn(lang.get('agent.interrupted') || '⚠️  Processamento interrompido pelo usuário.');
+                interruptionHandler.stopListening();
+                return;
+            }
         } catch (error) {
             spinner.fail('Erro ao processar IA');
             logger.error('Erro no aiService.sendPrompt', error);
+            interruptionHandler.stopListening();
             return;
         }
 
@@ -158,6 +188,13 @@ async function handleAiPrompt(userInput) {
 
         if (aiMessage.tool_calls && aiMessage.tool_calls.length > 0) {
             for (const toolCall of aiMessage.tool_calls) {
+                // Verificar interrupção antes de cada tool call
+                if (interruptionHandler.isInterrupted()) {
+                    logger.warn(lang.get('agent.interrupted') || '⚠️  Processamento interrompido pelo usuário.');
+                    interruptionHandler.stopListening();
+                    return;
+                }
+
                 const toolName = toolCall.function.name;
                 const toolArgs = JSON.parse(toolCall.function.arguments);
 
@@ -215,11 +252,16 @@ async function handleAiPrompt(userInput) {
         } else {
             logger.response(aiMessage.content);
 
+            // Desativar o listener quando terminar
+            interruptionHandler.stopListening();
             return;
         }
     }
 
     logger.warn(lang.get('agent.iterationLimit'));
+
+    // Desativar o listener ao final
+    interruptionHandler.stopListening();
 }
 
 export default handleAiPrompt;

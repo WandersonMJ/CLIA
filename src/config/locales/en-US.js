@@ -123,7 +123,9 @@ export default {
         denied: "Action {0} was denied by the user.",
         toolNotFound: "Error: Tool '{0}' not implemented.",
         sysPromptError: "Fatal error building system prompt:",
-        sysPromptLoadError: "Could not load system-prompt.md", iterationLimit: "Iteration limit reached. The task may not be complete.",
+        sysPromptLoadError: "Could not load system-prompt.md",
+        iterationLimit: "Iteration limit reached. The task may not be complete.",
+        interrupted: "⚠️  Processing interrupted by user (ESC pressed).",
         shell: {
             result: "Result of command '$ {0}':\n{1}",
             error: "ERROR executing '$ {0}': {1}"

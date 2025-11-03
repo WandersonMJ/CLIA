@@ -125,6 +125,7 @@ export default {
         sysPromptError: "Erro fatal ao construir o system prompt:",
         sysPromptLoadError: "Não foi possível carregar o system-prompt.md",
         iterationLimit: "Limite de iterações atingido. A tarefa pode não estar completa.",
+        interrupted: "⚠️  Processamento interrompido pelo usuário (ESC pressionado).",
         shell: {
             result: "Resultado do comando '$ {0}':\n{1}",
             error: "ERRO ao executar '$ {0}': {1}"
