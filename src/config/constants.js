@@ -13,14 +13,14 @@ export const OS_PROMPTS_DIR = `${PROMPTS_DIR}/os-commands`;
 export const MAX_ITERATIONS = 200;
 export const LOG_PREVIEW_LENGTH = 100;
 export const CRITICAL_ACTIONS = [
-    'CREATE', 
-    'UPDATE', 
-    'DELETE', 
-    'SHELL', 
-    'EDIT_LINES', 
-    'INSERT_LINES', 
-    'REPLACE_IN_FILE', 
-    'CREATE_WITH_CONTENT', 
+    'CREATE',
+    'UPDATE',
+    'DELETE',
+    'SHELL',
+    'EDIT_LINES',
+    'INSERT_LINES',
+    'REPLACE_IN_FILE',
+    'CREATE_WITH_CONTENT',
     'MOVE',
     'APPLY_PATCH',
     'CREATE_DIRECTORY',
@@ -68,7 +68,10 @@ export const OPENAI_MODELS = [
     { name: 'GPT-4o Mini', value: 'gpt-4o-mini' },
     { name: 'GPT-4o', value: 'gpt-4o' },
     { name: 'GPT-4 Turbo', value: 'gpt-4-turbo' },
-    { name: 'GPT-5 nano', value: 'gpt-5-nano-2025-08-07'}
+    { name: 'GPT-5 nano', value: 'gpt-5-nano-2025-08-07' },
+    { name: 'GPT-5 codex', value: 'gpt-5-codex' },
+    { name: 'gpt-5-2025-08-07', values: 'gpt-5-2025-08-07' },
+    { name: 'gpt-5-mini-2025-08-07', values: 'gpt-5-mini-2025-08-07' }
 ];
 
 // --- Valores Padrão dos Modelos ---

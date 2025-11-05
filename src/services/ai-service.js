@@ -3,6 +3,7 @@ import geminiClient from '../agent/api/ai/gemini-client.js';
 import openAiClient from '../agent/api/ai/open-ai-client.js';
 import claudeClient from '../agent/api/ai/claude-client.js';
 import { gzipSync } from 'zlib';
+import convoLogger from '../utils/conversation-logger.js';
 
 // Opção A: compressão de contexto antes de enviar aos provedores de IA
 const CONTEXT_COMPRESSION_ENABLED = false;
@@ -23,6 +24,9 @@ function compressContext(history) {
  */
 async function sendPrompt(history, tools) {
   const provider = session.getProvider();
+  const creds = session.getCredentials?.() || {};
+  const model = creds.model;
+  const mode = session.getMode?.() || 'normal';
 
   // Construir histórico efetivo com compressão se necessário
   let effectiveHistory = history;
@@ -37,16 +41,32 @@ async function sendPrompt(history, tools) {
     }
   }
 
+  // Log de request
+  try {
+    convoLogger.logRequest({ provider, model, mode, phase: 'single', history: effectiveHistory, tools });
+  } catch (_) { /* não falhar por causa de log */ }
+
+  let response;
   switch (provider) {
     case 'gemini':
-      return geminiClient.sendMessage(effectiveHistory, tools);
+      response = await geminiClient.sendMessage(effectiveHistory, tools);
+      break;
     case 'openai':
-      return openAiClient.sendMessage(effectiveHistory, tools);
+      response = await openAiClient.sendMessage(effectiveHistory, tools);
+      break;
     case 'claude':
-      return claudeClient.sendMessage(effectiveHistory, tools);
+      response = await claudeClient.sendMessage(effectiveHistory, tools);
+      break;
     default:
       throw new Error('Provedor de IA não configurado ou desconhecido.');
   }
+
+  // Log de response
+  try {
+    convoLogger.logResponse({ provider, model, mode, phase: 'single', response });
+  } catch (_) { /* não falhar por causa de log */ }
+
+  return response;
 }
 
 export default { sendPrompt };

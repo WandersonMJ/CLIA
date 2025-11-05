@@ -428,7 +428,7 @@ function escapeRegExp(string) {
 function applyPatchToFile(filePath, patchContent) {
     const normalizedPath = path.normalize(filePath);
 
-    // Validação (baseada nas suas outras funções)
+    // Validação
     if (!fs.existsSync(normalizedPath)) {
         return {
             success: false,
@@ -446,28 +446,100 @@ function applyPatchToFile(filePath, patchContent) {
     try {
         const oldContent = fs.readFileSync(normalizedPath, 'utf-8');
 
-        // Aplicar o Patch
-        const newContent = applyPatch(oldContent, patchContent);
-
-        if (newContent === false) {
+        // Validar formato básico do patch
+        if (!patchContent || typeof patchContent !== 'string') {
             return {
                 success: false,
-                content: `ERRO: O patch não pôde ser aplicado. O patch pode estar mal formatado ou o conteúdo do arquivo mudou.`
+                content: `ERRO: Patch inválido ou vazio.`
+            };
+        }
+
+        // Normalizar quebras de linha do patch
+        const normalizedPatch = patchContent.replace(/\r\n/g, '\n');
+
+        // Tentar aplicar o patch
+        let newContent;
+        try {
+            newContent = applyPatch(oldContent, normalizedPatch);
+        } catch (patchError) {
+            // Extrair informação útil do erro
+            const errorMsg = patchError.message || String(patchError);
+
+            // Tentar extrair qual linha está causando problema
+            const lineMatch = errorMsg.match(/line (\d+)/i);
+            const unknownLineMatch = errorMsg.match(/Unknown line \d+ "([^"]+)"/);
+
+            let helpText = `\n\n💡 DICAS:
+- O arquivo pode ter mudado desde que você leu pela última vez
+- Verifique se há diferenças de espaçamento (tabs vs espaços)
+- Prefira usar EDIT_LINES, REPLACE_IN_FILE ou UPDATE em vez de APPLY_PATCH
+- Leia o arquivo novamente antes de tentar aplicar patches`;
+
+            if (unknownLineMatch) {
+                helpText += `\n- O patch esperava encontrar: "${unknownLineMatch[1]}"`;
+            }
+
+            return {
+                success: false,
+                content: `ERRO ao aplicar patch: ${errorMsg}${helpText}`
+            };
+        }
+
+        if (newContent === false || newContent === null || newContent === undefined) {
+            // Mostrar preview do arquivo atual para ajudar a IA
+            const lines = oldContent.split('\n');
+            const preview = lines.slice(0, 10).join('\n');
+
+            return {
+                success: false,
+                content: `ERRO: Patch rejeitado. O conteúdo do arquivo não corresponde ao patch.
+
+📄 Estado atual do arquivo (primeiras 10 linhas):
+${preview}
+${lines.length > 10 ? `\n... (mais ${lines.length - 10} linhas)` : ''}
+
+💡 SUGESTÕES:
+1. Leia o arquivo novamente com READ para ver o conteúdo atual
+2. Use REPLACE_IN_FILE para buscar e substituir texto específico
+3. Use EDIT_LINES com números de linha específicos
+4. Use UPDATE para reescrever o arquivo completo
+
+⚠️  APPLY_PATCH é muito sensível a mudanças. Use outras ferramentas quando possível.`
+            };
+        }
+
+        // Validar que o conteúdo mudou
+        if (newContent === oldContent) {
+            return {
+                success: true,
+                content: `⚠️  Patch aplicado, mas o conteúdo não mudou. O patch pode já ter sido aplicado anteriormente.`
             };
         }
 
         // Salvar o arquivo
         fs.writeFileSync(normalizedPath, newContent, 'utf-8');
 
+        // Calcular estatísticas da mudança
+        const oldLines = oldContent.split('\n').length;
+        const newLines = newContent.split('\n').length;
+        const diff = newLines - oldLines;
+        const diffText = diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : '±0';
+
         return {
             success: true,
-            content: `✅ Patch aplicado com sucesso em '${normalizedPath}'.`
+            content: `✅ Patch aplicado com sucesso em '${normalizedPath}'
+Linhas: ${oldLines} → ${newLines} (${diffText})`
         };
     } catch (error) {
         logger.error(`Erro ao aplicar patch: ${filePath}`, error);
         return {
             success: false,
-            content: `ERRO ao aplicar patch: ${error.message}`
+            content: `ERRO ao aplicar patch: ${error.message}
+
+💡 Considere usar outras ferramentas mais robustas:
+- EDIT_LINES: Para editar linhas específicas
+- REPLACE_IN_FILE: Para buscar e substituir
+- UPDATE: Para reescrever o arquivo completo`
         };
     }
 }

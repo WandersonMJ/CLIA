@@ -65,6 +65,23 @@ function walk(dir, rootDir, ig) {
 }
 
 /**
+ * Lê as primeiras N linhas de um arquivo como string.
+ * @param {string} absoluteFilePath Caminho absoluto do arquivo.
+ * @param {number} lineCount Quantidade de linhas a retornar (padrão 5).
+ * @returns {string} As primeiras N linhas unidas por \n ou mensagem de erro.
+ */
+function readFirstLines(absoluteFilePath, lineCount = 5) {
+    try {
+        const content = fs.readFileSync(absoluteFilePath, 'utf-8');
+        const lines = content.split(/\r?\n/).slice(0, lineCount);
+        return lines.join('\n');
+    } catch (error) {
+        logger.warn(`Não foi possível ler o arquivo: ${absoluteFilePath}`);
+        return `[ERRO_AO_LER_ARQUIVO] ${error.message}`;
+    }
+}
+
+/**
  * Gera um objeto JSON contendo a árvore de arquivos do projeto.
  * @param {string} rootDirParam - O diretório raiz (normalmente '.').
  * @returns {object} Um objeto no formato { projectTree: [...] }.
@@ -72,11 +89,16 @@ function walk(dir, rootDir, ig) {
 function generateFileTree(rootDirParam = '.') {
     const ig = loadGitIgnore(); 
     const absoluteRootDir = path.resolve(rootDirParam); 
-    const allPaths = walk(absoluteRootDir, absoluteRootDir, ig); 
+    const allPaths = walk(absoluteRootDir, absoluteRootDir, ig);
     
-    return {
-        projectTree: allPaths,
-    };
+    // Para cada arquivo, inclui um preview com as 5 primeiras linhas.
+    const projectTree = allPaths.map((relativePath) => {
+        const absolutePath = path.join(absoluteRootDir, relativePath);
+        const first5Lines = readFirstLines(absolutePath, 5);
+        return { path: relativePath, first5Lines };
+    });
+
+    return { projectTree };
 }
 
 export default generateFileTree;

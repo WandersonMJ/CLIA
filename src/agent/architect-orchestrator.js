@@ -19,6 +19,7 @@ import {
 import fs from 'fs';
 import path from 'path';
 import { OS_PROMPTS_DIR, PROMPTS_DIR } from '../config/constants.js';
+import convoLogger from '../utils/conversation-logger.js';
 
 /**
  * Gera o system prompt para uma fase específica
@@ -67,10 +68,13 @@ function getSystemPromptForPhase(phase, additionalContext = '') {
       promptTemplate += `\n\n${additionalContext}`;
     }
 
+    // Log do system para a fase
+    try { convoLogger.logSystem({ mode: 'architect', phase, content: promptTemplate, meta: { additionalContext } }); } catch (_) {}
+
     return promptTemplate;
   } catch (error) {
     logger.error('Erro ao gerar system prompt', error);
-    throw error;
+    return '';
   }
 }
 
@@ -253,6 +257,11 @@ async function runExecutorPhase(phase, executorConfig, systemPrompt, userMessage
     { role: 'user', content: userMessage }
   ];
 
+  // logs de início da fase
+  try {
+    convoLogger.logUser({ mode: 'architect', phase, content: userMessage });
+  } catch (_) {}
+
   let iterationCount = 0;
 
   while (iterationCount < MAX_ITERATIONS) {
@@ -276,6 +285,7 @@ async function runExecutorPhase(phase, executorConfig, systemPrompt, userMessage
     }
 
     history.push(aiMessage);
+    try { convoLogger.logAssistant({ mode: 'architect', phase, message: aiMessage }); } catch (_) {}
 
     // Se há tool calls, executar
     if (aiMessage.tool_calls && aiMessage.tool_calls.length > 0) {
@@ -284,6 +294,7 @@ async function runExecutorPhase(phase, executorConfig, systemPrompt, userMessage
         const toolArgs = JSON.parse(toolCall.function.arguments);
 
         logger.tool(lang.get('agent.toolExec', toolName));
+        try { convoLogger.logToolCall({ mode: 'architect', phase, toolName, args: toolArgs, tool_call_id: toolCall.id }); } catch (_) {}
 
         // Verificar permissões para ações críticas
         if (CRITICAL_ACTIONS.includes(toolName)) {
@@ -294,12 +305,14 @@ async function runExecutorPhase(phase, executorConfig, systemPrompt, userMessage
             const denialMessage = lang.get('agent.denied', toolName);
             logger.warn(denialMessage);
 
+            const denialPayload = { success: false, content: `[SYSTEM ERROR] ${denialMessage}` };
             history.push({
               role: 'tool',
               tool_call_id: toolCall.id,
               name: toolName,
-              content: `[SYSTEM ERROR] ${denialMessage}`,
+              content: JSON.stringify(denialPayload),
             });
+            try { convoLogger.logToolResult({ mode: 'architect', phase, toolName, result: denialPayload, tool_call_id: toolCall.id }); } catch (_) {}
             continue;
           }
         }
@@ -334,6 +347,7 @@ async function runExecutorPhase(phase, executorConfig, systemPrompt, userMessage
           name: toolName,
           content: JSON.stringify(toolResult)
         });
+        try { convoLogger.logToolResult({ mode: 'architect', phase, toolName, result: toolResult, tool_call_id: toolCall.id }); } catch (_) {}
       }
 
       continue; // Próxima iteração
@@ -377,6 +391,8 @@ Por favor, crie um plano mestre detalhado para executar esta tarefa.
     { role: 'user', content: fullPrompt }
   ];
 
+  try { convoLogger.logUser({ mode: 'architect', phase: 'planning', content: fullPrompt, meta: { userPrompt } }); } catch (_) {}
+
   logger.info('🏗️  Arquiteto está criando o plano mestre...');
   const spinner = ora('Arquiteto planejando...').start();
 
@@ -385,6 +401,7 @@ Por favor, crie um plano mestre detalhado para executar esta tarefa.
     spinner.succeed('Plano mestre criado!');
 
     logger.response(aiMessage.content);
+    try { convoLogger.logAssistant({ mode: 'architect', phase: 'planning', message: aiMessage }); } catch (_) {}
 
     return {
       success: true,
@@ -409,6 +426,18 @@ async function orchestrate(userPrompt) {
   logger.info(`👷 Executor: ${executorConfig.provider} (${executorConfig.model})`);
   logger.info(`🏛️  Arquiteto: ${architectConfig.provider} (${architectConfig.model})`);
 
+  try {
+    convoLogger.logEvent({
+      name: 'architect_mode_start',
+      mode: 'architect',
+      phase: 'init',
+      meta: {
+        architect: { provider: architectConfig.provider, model: architectConfig.model },
+        executor: { provider: executorConfig.provider, model: executorConfig.model }
+      }
+    });
+  } catch (_) {}
+
   const tools = getTools(true); // Modo economia = true para executor
 
   // ============================================================
@@ -431,6 +460,7 @@ async function orchestrate(userPrompt) {
   }
 
   const contextSummary = phase1Result.message;
+  try { convoLogger.logEvent({ name: 'context_collected', mode: 'architect', phase: 'context-gathering', meta: { summaryLength: contextSummary?.length } }); } catch (_) {}
 
   // ============================================================
   // FASE 2: PLANEJAMENTO (Arquiteto)
@@ -449,6 +479,7 @@ async function orchestrate(userPrompt) {
   }
 
   const masterPlan = phase2Result.plan;
+  try { convoLogger.logEvent({ name: 'plan_created', mode: 'architect', phase: 'planning', meta: { planLength: masterPlan?.length } }); } catch (_) {}
 
   // ============================================================
   // FASE 3: EXECUÇÃO (Executor)
@@ -473,10 +504,12 @@ ${masterPlan}
   if (!phase3Result.success) {
     logger.error('Falha na Fase 3: Execução');
     logger.warn('Possível necessidade de replanejamento...');
+    try { convoLogger.logEvent({ name: 'execution_failed', mode: 'architect', phase: 'execution', meta: { error: phase3Result.message } }); } catch (_) {}
     // TODO: Implementar loop de retry com o Arquiteto
     return;
   }
 
+  try { convoLogger.logEvent({ name: 'architect_mode_success', mode: 'architect', phase: 'done' }); } catch (_) {}
   logger.info('\n✅ Modo Arquiteto concluído com sucesso!');
 }
 

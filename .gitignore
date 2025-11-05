@@ -24,6 +24,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Logs de Conversação com IA
+.claude/
+ai-conversations.jsonl
+
 # Árvores de Arquivos e Outputs
 *-tree.json
 application-tree.json

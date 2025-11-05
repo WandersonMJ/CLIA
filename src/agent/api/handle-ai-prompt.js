@@ -12,6 +12,7 @@ import lang from '../../services/language-service.js';
 import ora from 'ora';
 import architectOrchestrator from '../architect-orchestrator.js';
 import interruptionHandler from '../../utils/interruption-handler.js';
+import convoLogger from '../../utils/conversation-logger.js';
 
 import {
     MAX_ITERATIONS,
@@ -127,11 +128,14 @@ async function handleAiPrompt(userInput) {
 
     // Modo normal (single-agent)
     if (conversationHistory.length === 0) {
+        const system = getSystemPrompt();
         conversationHistory = [
-            { role: 'system', content: getSystemPrompt() }
+            { role: 'system', content: system }
         ];
+        try { convoLogger.logSystem({ mode: session.getMode?.() || 'normal', phase: 'single', content: system }); } catch (_) {}
     }
     conversationHistory.push({ role: 'user', content: userInput });
+    try { convoLogger.logUser({ mode: session.getMode?.() || 'normal', phase: 'single', content: userInput }); } catch (_) {}
 
     const isEconomy = session.isEconomyMode();
     const availableTools = getTools(isEconomy);
@@ -185,6 +189,7 @@ async function handleAiPrompt(userInput) {
         }
 
         conversationHistory.push(aiMessage);
+        try { convoLogger.logAssistant({ mode: session.getMode?.() || 'normal', phase: 'single', message: aiMessage }); } catch (_) {}
 
         if (aiMessage.tool_calls && aiMessage.tool_calls.length > 0) {
             for (const toolCall of aiMessage.tool_calls) {
@@ -199,6 +204,7 @@ async function handleAiPrompt(userInput) {
                 const toolArgs = JSON.parse(toolCall.function.arguments);
 
                 logger.tool(lang.get('agent.toolExec', toolName));
+                try { convoLogger.logToolCall({ mode: session.getMode?.() || 'normal', phase: 'single', toolName, args: toolArgs, tool_call_id: toolCall.id }); } catch (_) {}
 
                 if (CRITICAL_ACTIONS.includes(toolName)) {
                     const argDetails = toolArgs.filePath || toolArgs.sourcePath || toolArgs.command || 'ação';
@@ -209,12 +215,14 @@ async function handleAiPrompt(userInput) {
                         const denialMessage = lang.get('agent.denied', toolName);
                         logger.warn(denialMessage);
 
+                        const denialPayload = { success: false, content: `[SYSTEM ERROR] ${denialMessage}` };
                         conversationHistory.push({
                             role: 'tool',
                             tool_call_id: toolCall.id,
                             name: toolName,
-                            content: `[SYSTEM ERROR] ${denialMessage}`,
+                            content: JSON.stringify(denialPayload),
                         });
+                        try { convoLogger.logToolResult({ mode: session.getMode?.() || 'normal', phase: 'single', toolName, result: denialPayload, tool_call_id: toolCall.id }); } catch (_) {}
                         continue;
                     }
                 }
@@ -222,7 +230,6 @@ async function handleAiPrompt(userInput) {
                 const toolFunction = getToolImplementation(toolName);
                 if (!toolFunction) {
                     logger.error(lang.get('agent.toolNotFound', toolName));
-
                     continue;
                 }
 
@@ -246,6 +253,7 @@ async function handleAiPrompt(userInput) {
                     name: toolName,
                     content: JSON.stringify(toolResult)
                 });
+                try { convoLogger.logToolResult({ mode: session.getMode?.() || 'normal', phase: 'single', toolName, result: toolResult, tool_call_id: toolCall.id }); } catch (_) {}
             }
 
             continue;

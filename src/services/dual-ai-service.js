@@ -1,6 +1,7 @@
 import geminiClient from '../agent/api/ai/gemini-client.js';
 import openAiClient from '../agent/api/ai/open-ai-client.js';
 import claudeClient from '../agent/api/ai/claude-client.js';
+import convoLogger from '../utils/conversation-logger.js';
 
 /**
  * Serviço para enviar prompts para uma configuração específica de IA.
@@ -14,82 +15,66 @@ import claudeClient from '../agent/api/ai/claude-client.js';
  * @param {string} apiKey - A chave da API
  * @param {Array<Object>} history - Histórico da conversa
  * @param {Array<Object>} tools - Ferramentas disponíveis
+ * @param {Object} meta - Metadados (ex.: { phase: 'planning' | 'execution' | 'context-gathering' })
  * @returns {Promise<Object>} Resposta da IA
  */
-async function sendPromptWithConfig(provider, model, apiKey, history, tools) {
+async function sendPromptWithConfig(provider, model, apiKey, history, tools, meta = {}) {
   // Cria uma instância temporária do cliente com as credenciais específicas
   const config = { apiKey, model };
 
+  // Log request
+  try { convoLogger.logRequest({ provider, model, mode: 'architect', phase: meta.phase || 'unknown', history, tools, meta }); } catch (_) {}
+
+  let response;
   switch (provider) {
     case 'gemini': {
-      // Salva o estado atual
       const originalState = geminiClient._client;
-
-      // Inicializa temporariamente com a nova config
       geminiClient.initialize(config);
-
       try {
-        const response = await geminiClient.sendMessage(history, tools);
-        return response;
+        response = await geminiClient.sendMessage(history, tools);
       } finally {
-        // Restaura o estado original
         geminiClient._client = originalState;
       }
+      break;
     }
-
     case 'openai': {
       const originalState = openAiClient._client;
-
       openAiClient.initialize(config);
-
       try {
-        const response = await openAiClient.sendMessage(history, tools);
-        return response;
+        response = await openAiClient.sendMessage(history, tools);
       } finally {
         openAiClient._client = originalState;
       }
+      break;
     }
-
     case 'claude': {
       const originalState = claudeClient._client;
-
       claudeClient.initialize(config);
-
       try {
-        const response = await claudeClient.sendMessage(history, tools);
-        return response;
+        response = await claudeClient.sendMessage(history, tools);
       } finally {
         claudeClient._client = originalState;
       }
+      break;
     }
-
     default:
       throw new Error(`Provedor desconhecido: ${provider}`);
   }
+
+  // Log response
+  try { convoLogger.logResponse({ provider, model, mode: 'architect', phase: meta.phase || 'unknown', response, meta }); } catch (_) {}
+
+  return response;
 }
 
-/**
- * Envia um prompt para o Arquiteto (IA de planejamento).
- * @param {Object} architectConfig - { provider, model, apiKey }
- * @param {Array<Object>} history - Histórico da conversa
- * @param {Array<Object>} tools - Ferramentas disponíveis (geralmente vazio para o arquiteto)
- * @returns {Promise<Object>} Resposta do Arquiteto
- */
-async function sendToArchitect(architectConfig, history, tools = []) {
+async function sendToArchitect(architectConfig, history, tools = [], meta = { phase: 'planning' }) {
   const { provider, model, apiKey } = architectConfig;
-  return sendPromptWithConfig(provider, model, apiKey, history, tools);
+  return sendPromptWithConfig(provider, model, apiKey, history, tools, meta);
 }
 
-/**
- * Envia um prompt para o Executor (IA de execução).
- * @param {Object} executorConfig - { provider, model, apiKey }
- * @param {Array<Object>} history - Histórico da conversa
- * @param {Array<Object>} tools - Ferramentas disponíveis para execução
- * @returns {Promise<Object>} Resposta do Executor
- */
-async function sendToExecutor(executorConfig, history, tools) {
+async function sendToExecutor(executorConfig, history, tools, meta = { phase: 'execution' }) {
   const { provider, model, apiKey } = executorConfig;
-  return sendPromptWithConfig(provider, model, apiKey, history, tools);
+  return sendPromptWithConfig(provider, model, apiKey, history, tools, meta);
 }
 
 export default {
